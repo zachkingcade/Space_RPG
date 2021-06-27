@@ -1,8 +1,8 @@
 /** @type {Phaser.Types.Core.GameConfig} */
 const config = {
     parent: 'game',
-    width: 800,
-    height: 450,
+    width: 450,
+    height: 800,
     scale: {
         mode: Phaser.Scale.ScaleModes.FIT
     },
