@@ -18,7 +18,9 @@ const config = {
         activePointers: 3
     },
     scene: [
+        Boot,
         MainScene,
+        Upgrade
     ],
     physics: {
         default: 'arcade',
