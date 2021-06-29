@@ -20,7 +20,8 @@ const config = {
     scene: [
         Boot,
         MainScene,
-        Upgrade
+        Upgrade,
+        Story
     ],
     physics: {
         default: 'arcade',

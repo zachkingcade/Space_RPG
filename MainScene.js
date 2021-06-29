@@ -5,7 +5,7 @@ class MainScene extends Phaser.Scene {
         this.signals = SignalManager.get();
     }
 
-    init(data){
+    init(data) {
         this.player = data.player;
         this.level = data.level;
     }
@@ -15,7 +15,7 @@ class MainScene extends Phaser.Scene {
             blue: 496,
             red: 497,
             green: 498,
-            yellow: 499
+            yellow: 499,
         }
         this.tileSize = {
             6: 70,
@@ -56,16 +56,16 @@ class MainScene extends Phaser.Scene {
             9: 5,
         }
         this.gridRows = this.player.gridSize;
-        this.gridColumns = Math.floor(this.gridRows/2);
+        this.gridColumns = Math.floor(this.gridRows / 2);
         //decide enemy data based on level
         this.enemyHealthMax = (this.level * (Math.floor(Math.random() * 50) + 25)) + 200;
         this.enemyHealth = this.enemyHealthMax;
         this.enemyAttackCooldownMax = Math.floor(Math.random() * 5) + 3;
         this.enemyAttackCooldown = this.enemyAttackCooldownMax;
         //determine enemy image
-        let num = Math.floor(Math.random() * (this.stageEnemyCount[Math.floor(this.level/10)]-1))+1;
-        this.enemyName = `${this.stages[Math.floor(this.level/10)]}${num}`;
-        console.log(num ,this.enemyName);
+        let num = Math.floor(Math.random() * (this.stageEnemyCount[Math.floor(this.level / 10)])) + 1;
+        this.enemyName = `${this.stages[Math.floor(this.level / 10)]}${num}`;
+        console.log(num, this.enemyName);
         //other varibles
         this.gameover = false;
         this.enemyDead = false;
@@ -74,15 +74,28 @@ class MainScene extends Phaser.Scene {
     create() {
         console.log("Started Main Scene!");
         //add grid background
-        let gridBG = this.add.image(225,675,"gridBackground");
-        gridBG.setScale(.40,.7);
-        let platform = this.add.image(0,0,"platform");
-        platform.setOrigin(0);
-        platform.setScale(.7,.7);
-        platform.setDepth(-1);
+        let gridBG = this.add.image(225, 675, "gridBackground");
+        gridBG.setScale(.40, .7);
+        //add main background
+        let background = this.add.image(-125, 0, this.stages[Math.floor(this.level / 10)]);
+        background.setOrigin(0);
+        background.setScale(.7, .7);
+        background.setDepth(-1);
         //add enemy graghic
-        this.enemyGraghic = this.add.image( 220, 300, this.enemyName);
-        this.enemyGraghic.setScale(.5);
+        this.enemyGraghic = this.add.image(220, 300, this.enemyName);
+        this.enemyGraghic.setScale(.45);
+        //check enemy data for special properties
+        if (enemyData[this.enemyName].scale) {
+            this.enemyGraghic.setScale(enemyData[this.enemyName].scale);
+        }
+        if(enemyData[this.enemyName].y){
+            this.enemyGraghic.y += enemyData[this.enemyName].y;
+        }
+        if(enemyData[this.enemyName].x){
+            this.enemyGraghic.x += enemyData[this.enemyName].x;
+        }
+        // Create the "hole" for the tiles to come out of
+        this.createHole();
         //lets start with our grid
         this.grid = [];
         for (let r = 0; r < this.gridRows; r++) {
@@ -99,38 +112,82 @@ class MainScene extends Phaser.Scene {
         }
         this.createHealthUi();
         this.createEnemyCounter();
+        this.createLevelText();
+
+        // DEBUG Cheat key - REMOVE ME
+        this.input.keyboard.on('keydown-N', () => {
+            //heal player
+            this.player.health = this.player.maxHealth;
+            this.scene.start("Upgrade", {
+                player: this.player,
+                level: this.level
+            })
+        });
     }
 
-    createHealthUi(){
+    createHole() {
+        const scale = this.tileScale[this.gridRows];
+        let stand = this.add.sprite(405, 555, "items", 501);
+        stand.setScale(scale);
+        stand.setTint(0x000000);
+        let hole = this.physics.add.sprite(405, 555, "items", 500)
+        hole.setScale(scale);
+        this.tweens.add({
+            targets: [hole],
+            alpha: 0.5,
+            yoyo: true,
+            repeat: -1,
+            duration: 1000
+        });
+        hole.setAngularVelocity(25);
+    }
+
+    createLevelText() {
+        this.levelText = this.add.text(20, 20, `Level: ${this.level}`, {
+            fontSize: "32px"
+        });
+        this.levelText.setInteractive();
+        this.levelText.on("pointerdown", () => {
+            this.playerAttack(100);
+        })
+    }
+
+    createHealthUi() {
         //create player health bar
         this.playerBar = this.add.graphics();
         this.playerBar.fillStyle(0x2ecc71, 1);
-        this.playerBar.fillRect(40, 535, 360, 40);
+        this.playerBar.fillRect(10, 535, 350, 40);
         //create enemy health bar
         this.enemyBar = this.add.graphics();
         this.enemyBar.fillStyle(0xe74c3c, 1);
         this.enemyBar.fillRect(125, 125, 225, 40);
         //create player health text
-        this.playerHpText = this.add.text(145, 545, `HP: ${this.player.health}/${this.player.maxHealth}`,{
+        this.playerHpText = this.add.text(115, 545, `HP: ${this.player.health}/${this.player.maxHealth}`, {
             fontSize: "24px"
         });
         //create enemy health text
-        this.enemyHpText = this.add.text(175, 135, `HP: ${this.enemyHealth}/${this.enemyHealthMax}`,{
+        this.enemyHpText = this.add.text(175, 135, `HP: ${this.enemyHealth}/${this.enemyHealthMax}`, {
+            fontSize: "20px"
+        });
+        //create enemy name text
+        this.enemyNameText = this.add.text(235, 70, `${enemyData[this.enemyName].name}`, {
+            fontSize: "32px",
+            fontStyle: "bold"
+        });
+        this.enemyNameText.setOrigin(.5);
+    }
+
+    createEnemyCounter() {
+        this.enemyAttackCounterText = this.add.text(130, 105, `AT: ${this.enemyAttackCooldown}`, {
             fontSize: "20px"
         });
     }
 
-    createEnemyCounter(){
-        this.enemyAttackCounterText = this.add.text(130, 105, `AT: ${this.enemyAttackCooldown}`,{
-            fontSize: "20px"
-        });
-    }
-
-    updateEnemyCounter(){
+    updateEnemyCounter() {
         this.enemyAttackCounterText.setText(`AT: ${this.enemyAttackCooldown}`);
     }
 
-    updateEnemyHealthBar(){
+    updateEnemyHealthBar() {
         this.enemyBar.clear();
         this.enemyBar.fillStyle(0xe74c3c, 1);
         if (this.enemyHealth > -1) {
@@ -141,26 +198,28 @@ class MainScene extends Phaser.Scene {
         this.enemyHpText.setText(`HP: ${this.enemyHealth}/${this.enemyHealthMax}`);
     }
 
-    updatePlayerHealthBar(){
+    updatePlayerHealthBar() {
         this.playerBar.clear();
         this.playerBar.fillStyle(0x2ecc71, 1);
         if (this.player.health > -1) {
-            this.playerBar.fillRect(40, 535, ((this.player.health / this.player.maxHealth) * 360), 40);
+            this.playerBar.fillRect(10, 535, ((this.player.health / this.player.maxHealth) * 350), 40);
         } else {
-            this.playerBar.fillRect(40, 535, 0, 40);
+            this.playerBar.fillRect(10, 535, 0, 40);
         }
         this.playerHpText.setText(`HP: ${this.player.health}/${this.player.maxHealth}`);
     }
 
     generateNewTileSprite(row, column, color) {
-        let tile = this.add.sprite(45 + (this.tileSize[this.gridRows] * row), 610 + (this.tileSize[this.gridRows] * column),
-        "items", this.colorIds[color])
-        tile.setScale(this.tileScale[this.gridRows]);
+        const x = 45 + (this.tileSize[this.gridRows] * row);
+        const y = 610 + (this.tileSize[this.gridRows] * column);
+        const scale = this.tileScale[this.gridRows];
+        let tile = this.add.sprite(405, 555, "items", this.colorIds[color])
+        tile.setScale(0);
         tile.row = row;
         tile.column = column;
         tile.setInteractive();
         tile.on("pointerdown", () => {
-            if(!this.gameover){
+            if (!this.gameover) {
                 this.combo = 0;
                 this.deleteTiles(tile.row, tile.column, color);
                 this.settleTiles();
@@ -168,13 +227,28 @@ class MainScene extends Phaser.Scene {
                 this.redrawTiles();
                 this.playerAttack(this.combo);
                 this.updateEnemyHealthBar();
-                if(!this.enemyDead){
+                if (!this.enemyDead) {
                     this.enemyAttack();
                     this.updatePlayerHealthBar();
                     this.updateEnemyCounter();
                 }
             }
         })
+        // Animate the tiles being moved to their starting location
+        this.tweens.add({
+            targets: [tile],
+            scale: scale,
+            duration: 150,
+            onComplete: () => {
+                this.tweens.add({
+                    targets: [tile],
+                    x: x,
+                    y: y,
+                    // Slightly differing speeds, idk looks neat I think
+                    duration: 150
+                });
+            }
+        });
         return tile;
     }
 
@@ -211,10 +285,21 @@ class MainScene extends Phaser.Scene {
         for (let r = 0; r < this.gridRows; r++) {
             for (let c = 0; c < this.gridColumns; c++) {
                 if (this.grid[r] && this.grid[r][c]) {
-                    this.grid[r][c].sprite.x = 45 + (this.tileSize[this.gridRows] * r);
-                    this.grid[r][c].sprite.y = 610 + (this.tileSize[this.gridRows] * c);
-                    this.grid[r][c].sprite.row = r;
-                    this.grid[r][c].sprite.column = c;
+                    const x = 45 + (this.tileSize[this.gridRows] * r);
+                    const y = 610 + (this.tileSize[this.gridRows] * c);
+                    let spr = this.grid[r][c].sprite;
+                    this.tweens.add({
+                        targets: [spr],
+                        x: x,
+                        y: y,
+                        duration: 150
+                    });
+                    spr.row = r;
+                    spr.column = c;
+                    // this.grid[r][c].sprite.x = 45 + (this.tileSize[this.gridRows] * r);
+                    // this.grid[r][c].sprite.y = 610 + (this.tileSize[this.gridRows] * c);
+                    // this.grid[r][c].sprite.row = r;
+                    // this.grid[r][c].sprite.column = c;
                 }
             }
         }
@@ -272,17 +357,17 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    calculateDamage(combo){
-        return Math.floor((this.player.baseDamage + this.player.tileMod * (combo-1)) * combo);
+    calculateDamage(combo) {
+        return Math.floor((this.player.baseDamage + this.player.tileMod * (combo - 1)) * combo);
     }
 
-    enemyAttack(){
+    enemyAttack() {
         this.enemyAttackCooldown--;
-        if(this.enemyAttackCooldown < 1){
+        if (this.enemyAttackCooldown < 1) {
             this.player.health -= (this.level * Math.floor(Math.random() * 3) + 2) + 35;
             this.enemyAttackCooldown = this.enemyAttackCooldownMax;
         }
-        if(this.player.health < 1){
+        if (this.player.health < 1) {
             this.gameover = true;
             this.gameoverScreen = this.add.graphics();
             this.gameoverScreen.fillStyle(0xe74c3c, 1);
@@ -294,12 +379,12 @@ class MainScene extends Phaser.Scene {
                 alpha: 1,
                 onComplete:
                     () => {
-                        let gameoverText = this.add.text(225, 400, "Game Over!",{
+                        let gameoverText = this.add.text(225, 400, "Game Over!", {
                             fontSize: "48px",
                             color: "black"
                         });
                         gameoverText.alpha = 0;
-                        gameoverText.setOrigin(.5,.5);
+                        gameoverText.setOrigin(.5, .5);
                         this.tweens.add({
                             targets: gameoverText,
                             duration: 500,
@@ -314,10 +399,10 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    playerAttack(combo){
+    playerAttack(combo) {
         let damage = this.calculateDamage(combo);
         this.enemyHealth -= damage;
-        if(this.enemyHealth < 1){
+        if (this.enemyHealth < 1) {
             this.enemyDead = true;
             this.tweens.add({
                 targets: this.enemyGraghic,
@@ -328,7 +413,7 @@ class MainScene extends Phaser.Scene {
                         setTimeout(() => {
                             //heal player
                             this.player.health = this.player.maxHealth;
-                            this.scene.start("Upgrade",{
+                            this.scene.start("Upgrade", {
                                 player: this.player,
                                 level: this.level
                             })

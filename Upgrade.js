@@ -13,6 +13,31 @@ class Upgrade extends Phaser.Scene {
         console.log("Upgrade Scene Started!");
         this.addText();
         this.upgradePicked = false;
+
+        // DEBUG Cheat key - REMOVE ME
+        this.input.keyboard.on('keydown-N', () => {
+            this.player.maxHealth += 150;
+            this.player.baseDamage += 3;
+            this.player.tileMod += 0.6;
+            this.player.gridSize = 10;
+            this.player.health = this.player.maxHealth;
+            this.leaveScene();
+        });
+    }
+
+    leaveScene() {
+        this.level += 1;
+        if (Number.isInteger(this.level / 10)) {
+            this.scene.start("Story", {
+                player: this.player,
+                level: this.level
+            })
+        } else {
+            this.scene.start("MainScene", {
+                player: this.player,
+                level: this.level
+            })
+        }
     }
 
     addText() {
@@ -53,10 +78,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene", {
-                            player: this.player,
-                            level: (this.level + 1)
-                        })
+                        this.leaveScene();
                     }
                 })
             }
@@ -80,10 +102,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene", {
-                            player: this.player,
-                            level: (this.level + 1)
-                        })
+                        this.leaveScene();
                     }
                 })
             }
@@ -108,10 +127,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene", {
-                            player: this.player,
-                            level: (this.level + 1)
-                        })
+                        this.leaveScene();
                     }
                 })
             }
@@ -137,10 +153,7 @@ class Upgrade extends Phaser.Scene {
                         yoyo: true,
                         repeat: 8,
                         onComplete: () => {
-                            this.scene.start("MainScene", {
-                                player: this.player,
-                                level: (this.level + 1)
-                            })
+                            this.leaveScene();
                         }
                     })
                 }
