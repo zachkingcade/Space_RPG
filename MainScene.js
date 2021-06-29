@@ -17,13 +17,55 @@ class MainScene extends Phaser.Scene {
             green: 498,
             yellow: 499
         }
-        this.gridRows = 10;
-        this.gridColumns = 5;
+        this.tileSize = {
+            6: 70,
+            7: 60,
+            8: 50,
+            9: 45,
+            10: 40
+        }
+        this.tileScale = {
+            6: 3.5,
+            7: 3.5,
+            8: 3,
+            9: 2.75,
+            10: 2.5
+        }
+        this.stages = {
+            0: "01_wreck",
+            1: "02_junkyard",
+            2: "03_forest",
+            3: "04_distantCity",
+            4: "05_town",
+            5: "06_door",
+            6: "07_hallway",
+            7: "08_medbay",
+            8: "09_breakout",
+            9: "10_FinalRoom",
+        }
+        this.stageEnemyCount = {
+            0: 5,
+            1: 4,
+            2: 4,
+            3: 6,
+            4: 6,
+            5: 5,
+            6: 5,
+            7: 6,
+            8: 7,
+            9: 5,
+        }
+        this.gridRows = this.player.gridSize;
+        this.gridColumns = Math.floor(this.gridRows/2);
         //decide enemy data based on level
-        this.enemyHealthMax = (this.level * Math.floor(Math.random() * 25) + 25) + 200;
+        this.enemyHealthMax = (this.level * (Math.floor(Math.random() * 50) + 25)) + 200;
         this.enemyHealth = this.enemyHealthMax;
-        this.enemyAttackCooldownMax = Math.floor(Math.random() * 6) + 2;
+        this.enemyAttackCooldownMax = Math.floor(Math.random() * 5) + 3;
         this.enemyAttackCooldown = this.enemyAttackCooldownMax;
+        //determine enemy image
+        let num = Math.floor(Math.random() * (this.stageEnemyCount[Math.floor(this.level/10)]-1))+1;
+        this.enemyName = `${this.stages[Math.floor(this.level/10)]}${num}`;
+        console.log(num ,this.enemyName);
         //other varibles
         this.gameover = false;
         this.enemyDead = false;
@@ -39,9 +81,9 @@ class MainScene extends Phaser.Scene {
         platform.setScale(.7,.7);
         platform.setDepth(-1);
         //add enemy graghic
-        this.enemyGraghic = this.add.image( 220, 300, "blueSlime");
+        this.enemyGraghic = this.add.image( 220, 300, this.enemyName);
         this.enemyGraghic.setScale(.5);
-        //lets start with a 30 x this.gridRows grid
+        //lets start with our grid
         this.grid = [];
         for (let r = 0; r < this.gridRows; r++) {
             this.grid[r] = [];
@@ -111,8 +153,9 @@ class MainScene extends Phaser.Scene {
     }
 
     generateNewTileSprite(row, column, color) {
-        let tile = this.add.sprite(45 + (40 * row), 610 + (40 * column), "items", this.colorIds[color])
-        tile.setScale(2.5);
+        let tile = this.add.sprite(45 + (this.tileSize[this.gridRows] * row), 610 + (this.tileSize[this.gridRows] * column),
+        "items", this.colorIds[color])
+        tile.setScale(this.tileScale[this.gridRows]);
         tile.row = row;
         tile.column = column;
         tile.setInteractive();
@@ -168,8 +211,8 @@ class MainScene extends Phaser.Scene {
         for (let r = 0; r < this.gridRows; r++) {
             for (let c = 0; c < this.gridColumns; c++) {
                 if (this.grid[r] && this.grid[r][c]) {
-                    this.grid[r][c].sprite.x = 45 + (40 * r);
-                    this.grid[r][c].sprite.y = 610 + (40 * c);
+                    this.grid[r][c].sprite.x = 45 + (this.tileSize[this.gridRows] * r);
+                    this.grid[r][c].sprite.y = 610 + (this.tileSize[this.gridRows] * c);
                     this.grid[r][c].sprite.row = r;
                     this.grid[r][c].sprite.column = c;
                 }
@@ -287,7 +330,7 @@ class MainScene extends Phaser.Scene {
                             this.player.health = this.player.maxHealth;
                             this.scene.start("Upgrade",{
                                 player: this.player,
-                                level: this.level+1
+                                level: this.level
                             })
                         }, 500);
                     }

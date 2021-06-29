@@ -4,7 +4,7 @@ class Upgrade extends Phaser.Scene {
         super("Upgrade");
     }
 
-    init(data){
+    init(data) {
         this.player = data.player;
         this.level = data.level;
     }
@@ -15,14 +15,14 @@ class Upgrade extends Phaser.Scene {
         this.upgradePicked = false;
     }
 
-    addText(){
-        this.add.text(125, 100, `Player Stats: `,{
+    addText() {
+        this.add.text(125, 100, `Player Stats: `, {
             fontSize: "24px"
         });
-        this.add.text(125, 175, `Level: ${this.level}`,{
+        this.add.text(125, 175, `Level: ${this.level}`, {
             fontSize: "24px"
         });
-        let flashingText = this.add.text(40, 250, `Pick One Below to Upgrade:`,{
+        let flashingText = this.add.text(40, 250, `Pick One Below to Upgrade:`, {
             fontSize: "24px",
         });
         this.tweens.add({
@@ -34,12 +34,12 @@ class Upgrade extends Phaser.Scene {
         })
 
         //pickable stats
-        this.healthText = this.add.text(125, 375, `Health: ${this.player.maxHealth} `,{
+        this.healthText = this.add.text(125, 375, `Health: ${this.player.maxHealth} `, {
             fontSize: "24px"
         });
         this.healthText.setInteractive();
         this.healthText.on("pointerdown", () => {
-            if(!this.upgradePicked){
+            if (!this.upgradePicked) {
                 this.upgradePicked = true;
                 //add health to the player
                 this.player.maxHealth += 50;
@@ -53,7 +53,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene",{
+                        this.scene.start("MainScene", {
                             player: this.player,
                             level: (this.level + 1)
                         })
@@ -61,12 +61,12 @@ class Upgrade extends Phaser.Scene {
                 })
             }
         })
-        this.damageText = this.add.text(125, 450, `Base Damage: ${this.player.baseDamage} `,{
+        this.damageText = this.add.text(125, 450, `Base Damage: ${this.player.baseDamage} `, {
             fontSize: "24px"
         });
         this.damageText.setInteractive();
         this.damageText.on("pointerdown", () => {
-            if(!this.upgradePicked){
+            if (!this.upgradePicked) {
                 this.upgradePicked = true;
                 //add health to the player
                 this.player.baseDamage += 1;
@@ -80,7 +80,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene",{
+                        this.scene.start("MainScene", {
                             player: this.player,
                             level: (this.level + 1)
                         })
@@ -88,12 +88,12 @@ class Upgrade extends Phaser.Scene {
                 })
             }
         })
-        this.tileModText = this.add.text(125, 525, `Tile Modifer: ` + this.player.tileMod.toFixed(1),{
+        this.tileModText = this.add.text(125, 525, `Tile Modifer: ` + this.player.tileMod.toFixed(1), {
             fontSize: "24px"
         });
         this.tileModText.setInteractive();
         this.tileModText.on("pointerdown", () => {
-            if(!this.upgradePicked){
+            if (!this.upgradePicked) {
                 this.upgradePicked = true;
                 //add health to the player
                 this.player.tileMod += 0.2;
@@ -108,7 +108,7 @@ class Upgrade extends Phaser.Scene {
                     yoyo: true,
                     repeat: 8,
                     onComplete: () => {
-                        this.scene.start("MainScene",{
+                        this.scene.start("MainScene", {
                             player: this.player,
                             level: (this.level + 1)
                         })
@@ -116,5 +116,40 @@ class Upgrade extends Phaser.Scene {
                 })
             }
         })
+        if (this.player.gridSize < 10) {
+            this.gridSizeText = this.add.text(125, 600, `Grid Size: ${this.player.gridSize}`, {
+                fontSize: "24px"
+            });
+            this.gridSizeText.setInteractive();
+            this.gridSizeText.on("pointerdown", () => {
+                if (!this.upgradePicked) {
+                    this.upgradePicked = true;
+                    //add health to the player
+                    this.player.gridSize += 1;
+                    this.player.health = this.player.maxHealth;
+                    console.log(parseInt(this.player.tileMod));
+                    this.gridSizeText.setText(`Grid Size: ${this.player.gridSize}`);
+                    //animate things
+                    this.tweens.add({
+                        targets: this.gridSizeText,
+                        duration: 125,
+                        alpha: 0,
+                        yoyo: true,
+                        repeat: 8,
+                        onComplete: () => {
+                            this.scene.start("MainScene", {
+                                player: this.player,
+                                level: (this.level + 1)
+                            })
+                        }
+                    })
+                }
+            })
+        } else {
+            this.gridSizeText = this.add.text(125, 600, `Grid Size: ${this.player.gridSize} (MAX)`, {
+                fontSize: "24px",
+                color: "gold"
+            });
+        }
     }
 }
