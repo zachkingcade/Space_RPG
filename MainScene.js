@@ -65,7 +65,6 @@ class MainScene extends Phaser.Scene {
         //determine enemy image
         let num = Math.floor(Math.random() * (this.stageEnemyCount[Math.floor(this.level / 10)])) + 1;
         this.enemyName = `${this.stages[Math.floor(this.level / 10)]}${num}`;
-        console.log(num, this.enemyName);
         //other varibles
         this.gameover = false;
         this.enemyDead = false;
@@ -88,10 +87,10 @@ class MainScene extends Phaser.Scene {
         if (enemyData[this.enemyName].scale) {
             this.enemyGraghic.setScale(enemyData[this.enemyName].scale);
         }
-        if(enemyData[this.enemyName].y){
+        if (enemyData[this.enemyName].y) {
             this.enemyGraghic.y += enemyData[this.enemyName].y;
         }
-        if(enemyData[this.enemyName].x){
+        if (enemyData[this.enemyName].x) {
             this.enemyGraghic.x += enemyData[this.enemyName].x;
         }
         // Create the "hole" for the tiles to come out of
@@ -113,6 +112,9 @@ class MainScene extends Phaser.Scene {
         this.createHealthUi();
         this.createEnemyCounter();
         this.createLevelText();
+
+        // Quick shot mechanics
+        this.fastShots = [];
 
         // DEBUG Cheat key - REMOVE ME
         this.input.keyboard.on('keydown-N', () => {
@@ -144,7 +146,9 @@ class MainScene extends Phaser.Scene {
 
     createLevelText() {
         this.levelText = this.add.text(20, 20, `Level: ${this.level}`, {
-            fontSize: "32px"
+            fontSize: "32px",
+            stroke: 'black',
+            strokeThickness: 6
         });
         this.levelText.setInteractive();
         this.levelText.on("pointerdown", () => {
@@ -161,6 +165,7 @@ class MainScene extends Phaser.Scene {
         this.enemyBar = this.add.graphics();
         this.enemyBar.fillStyle(0xe74c3c, 1);
         this.enemyBar.fillRect(125, 125, 225, 40);
+        this.enemyBar.setDepth(2);
         //create player health text
         this.playerHpText = this.add.text(115, 545, `HP: ${this.player.health}/${this.player.maxHealth}`, {
             fontSize: "24px"
@@ -169,22 +174,27 @@ class MainScene extends Phaser.Scene {
         this.enemyHpText = this.add.text(175, 135, `HP: ${this.enemyHealth}/${this.enemyHealthMax}`, {
             fontSize: "20px"
         });
+        this.enemyHpText.setDepth(2);
         //create enemy name text
         this.enemyNameText = this.add.text(235, 70, `${enemyData[this.enemyName].name}`, {
             fontSize: "32px",
-            fontStyle: "bold"
+            fontStyle: "bold",
+            stroke: 'black',
+            strokeThickness: 6
         });
         this.enemyNameText.setOrigin(.5);
     }
 
     createEnemyCounter() {
-        this.enemyAttackCounterText = this.add.text(130, 105, `AT: ${this.enemyAttackCooldown}`, {
-            fontSize: "20px"
-        });
+        this.enemyAttackCounterText = this.add.text(225, 105, `Attacks in ${this.enemyAttackCooldown} turns`, {
+            fontSize: "20px",
+            stroke: 'black',
+            strokeThickness: 3
+        }).setOrigin(0.5);
     }
 
     updateEnemyCounter() {
-        this.enemyAttackCounterText.setText(`AT: ${this.enemyAttackCooldown}`);
+        this.enemyAttackCounterText.setText(`Attacks in ${this.enemyAttackCooldown} turns`);
     }
 
     updateEnemyHealthBar() {
@@ -219,19 +229,25 @@ class MainScene extends Phaser.Scene {
         tile.column = column;
         tile.setInteractive();
         tile.on("pointerdown", () => {
-            if (!this.gameover) {
+            // If the game isn't over and the enemy isn't dead
+            if (tile.active && !this.gameover && !this.enemyDead) {
                 this.combo = 0;
+                // Remove the tiles that were clicked on
                 this.deleteTiles(tile.row, tile.column, color);
                 this.settleTiles();
                 this.shiftColumnsInwards();
-                this.redrawTiles();
                 this.playerAttack(this.combo);
                 this.updateEnemyHealthBar();
+                // If the enemy still isn't dead after all that
                 if (!this.enemyDead) {
                     this.enemyAttack();
                     this.updatePlayerHealthBar();
                     this.updateEnemyCounter();
                 }
+                // Wait a moment to redraw the tiles
+                setTimeout(() => {
+                    this.redrawTiles();
+                }, 50);
             }
         })
         // Animate the tiles being moved to their starting location
@@ -256,13 +272,22 @@ class MainScene extends Phaser.Scene {
         if (row < this.gridRows && row > -1 && column > -1 && column < this.gridColumns && this.grid[row][column]) {
             if (this.grid[row][column].color == color) {
                 this.combo++;
-                this.grid[row][column].sprite.destroy();
+                let spr = this.grid[row][column].sprite;
                 this.grid[row][column] = null;
                 //search the 4 cardinal directions
                 this.deleteTiles(row + 1, column, color);
                 this.deleteTiles(row - 1, column, color);
                 this.deleteTiles(row, column + 1, color);
                 this.deleteTiles(row, column - 1, color);
+                // Tween to make tile vanish
+                this.tweens.add({
+                    targets: [spr],
+                    duration: 150,
+                    alpha: 0,
+                    onComplete: () => {
+                        spr.destroy();
+                    }
+                });
             }
         }
     }
@@ -296,10 +321,6 @@ class MainScene extends Phaser.Scene {
                     });
                     spr.row = r;
                     spr.column = c;
-                    // this.grid[r][c].sprite.x = 45 + (this.tileSize[this.gridRows] * r);
-                    // this.grid[r][c].sprite.y = 610 + (this.tileSize[this.gridRows] * c);
-                    // this.grid[r][c].sprite.row = r;
-                    // this.grid[r][c].sprite.column = c;
                 }
             }
         }
@@ -358,7 +379,11 @@ class MainScene extends Phaser.Scene {
     }
 
     calculateDamage(combo) {
-        return Math.floor((this.player.baseDamage + this.player.tileMod * (combo - 1)) * combo);
+        const extraShots = this.fastShots.length - 1;
+        const quickDraw = (this.player.quickDraw * .2) + extraShots;
+        const comboBonus = this.player.tileMod * (combo - 1);
+        const damagePerTile = this.player.baseDamage + comboBonus + quickDraw;
+        return Math.floor(damagePerTile * combo);
     }
 
     enemyAttack() {
@@ -366,42 +391,64 @@ class MainScene extends Phaser.Scene {
         if (this.enemyAttackCooldown < 1) {
             this.player.health -= (this.level * Math.floor(Math.random() * 3) + 2) + 35;
             this.enemyAttackCooldown = this.enemyAttackCooldownMax;
+            // Visual effect when enemy attacks
+            this.cameras.main.shake(150, 0.01);
         }
         if (this.player.health < 1) {
-            this.gameover = true;
-            this.gameoverScreen = this.add.graphics();
-            this.gameoverScreen.fillStyle(0xe74c3c, 1);
-            this.gameoverScreen.fillRect(0, 0, 450, 800);
-            this.gameoverScreen.alpha = 0;
-            this.tweens.add({
-                targets: this.gameoverScreen,
-                duration: 500,
-                alpha: 1,
-                onComplete:
-                    () => {
-                        let gameoverText = this.add.text(225, 400, "Game Over!", {
-                            fontSize: "48px",
-                            color: "black"
-                        });
-                        gameoverText.alpha = 0;
-                        gameoverText.setOrigin(.5, .5);
-                        this.tweens.add({
-                            targets: gameoverText,
-                            duration: 500,
-                            alpha: 1,
-                            onComplete:
-                                () => {
-                                    console.log("here");
-                                }
-                        });
-                    }
-            });
+            this.onGameOver();
         }
     }
 
+    onGameOver() {
+        this.gameover = true;
+        this.gameoverScreen = this.add.graphics();
+        this.gameoverScreen.fillStyle(0xe74c3c, 1);
+        this.gameoverScreen.fillRect(0, 0, 450, 800);
+        this.gameoverScreen.alpha = 0;
+        this.gameoverScreen.setDepth(9);
+        this.tweens.add({
+            targets: this.gameoverScreen,
+            duration: 500,
+            alpha: 1,
+            onComplete:
+                () => {
+                    let gameoverText = this.add.text(225, 400, "Game Over!", {
+                        fontSize: "48px",
+                        color: "black"
+                    });
+                    gameoverText.alpha = 0;
+                    gameoverText.setOrigin(.5, .5);
+                    gameoverText.setDepth(10);
+                    this.tweens.add({
+                        targets: gameoverText,
+                        duration: 500,
+                        alpha: 1,
+                        onComplete:
+                            () => {
+                                console.log("Game Over!");
+                                setTimeout(() => {
+                                    this.scene.start("Title");
+                                }, 1000);
+                            }
+                    });
+                }
+        });
+    }
+
     playerAttack(combo) {
+        // Update fast shots to include the most recent shot
+        // If there is no room, replace the oldest shot.
+        if (this.fastShots.length >= this.player.quickDraw + 1)
+            this.fastShots.shift();
+        this.fastShots.push(new Date().getTime());
+        // Calculate the damage
         let damage = this.calculateDamage(combo);
         this.enemyHealth -= damage;
+        if (combo < 10) {
+            this.smallComboBoom();
+        } else {
+            this.bigComboBoom();
+        }
         if (this.enemyHealth < 1) {
             this.enemyDead = true;
             this.tweens.add({
@@ -423,7 +470,57 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    update() {
+    bigComboBoom() {
+        this.sound.play('comboBoom');
+        let graghic = this.add.sprite(this.enemyGraghic.x, this.enemyGraghic.y, "boomGraghic");
+        graghic.setScale(7);
+        graghic.play("boomAnim");
+        graghic.on("animationcomplete-boomAnim", () => {
+            graghic.destroy();
+        });
+        // Animation for being hit
+        this.enemyHitAnimation(20, 0xFF0000);
+    }
 
+    smallComboBoom() {
+        const xOffset = Math.floor(Math.random() * 55) - 27;
+        const yOffset = Math.floor(Math.random() * 55) - 27;
+        this.sound.play(`gunshot${Math.floor(Math.random() * 4)}`);
+        let graghic = this.add.sprite(this.enemyGraghic.x + xOffset, this.enemyGraghic.y + yOffset, "smoke");
+        graghic.play("smoke");
+        graghic.on("animationcomplete-smoke", () => {
+            graghic.destroy();
+        });
+        // Animation for being hit
+        this.enemyHitAnimation(1, 0xFF6666);
+    }
+
+    enemyHitAnimation(angleMin, tint) {
+        // Don't do this if they're already rotating
+        if (this.enemyGraghic.angle == 0) {
+            // Make em flash red
+            this.enemyGraghic.setTint(tint);
+            // Rotate the enemy a lil bit
+            let tween = this.tweens.add({
+                targets: [this.enemyGraghic],
+                // Slightly left or right
+                angle: (Math.floor(Math.random() * 4) + angleMin)
+                    * (Math.floor(Math.random() * 2) ? 1 : -1),
+                duration: 200,
+                // Bounce back, yo
+                yoyo: true,
+                onComplete: () => {
+                    // Untint em
+                    this.enemyGraghic.clearTint();
+                }
+            });
+        }
+    }
+
+    update() {
+        // Shots are removed from the fastShots array after 3 seconds
+        this.fastShots = this.fastShots.filter((time) => {
+            return time + 3000 > new Date().getTime();
+        });
     }
 }

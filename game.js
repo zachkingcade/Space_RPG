@@ -19,9 +19,11 @@ const config = {
     },
     scene: [
         Boot,
+        Title,
         MainScene,
         Upgrade,
-        Story
+        Story,
+        Credits
     ],
     physics: {
         default: 'arcade',

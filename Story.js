@@ -22,6 +22,19 @@ class Story extends Phaser.Scene {
             8: "09_breakout",
             9: "10_FinalRoom",
         }
+        //volume by song because apparently everything has to be custom, ughhh
+        this.stageVolumes = {
+            "01_wreck": .5,
+            "02_junkyard": .5,
+            "03_forest": .75,
+            "04_distantCity": .25,
+            "05_town": .5,
+            "06_door": .3,
+            "07_hallway": .5,
+            "08_medbay": .5,
+            "09_breakout": .25,
+            "10_FinalRoom": .25,
+        }
         this.storyBits = [
             `Well, that dunnit. Ten years o service and we get blasted outta space by some mangy ol bandits.
             Spun out like a dagum top. Lucky its just the ship in pieces, huh? Planet seems familiar though,
@@ -88,6 +101,12 @@ class Story extends Phaser.Scene {
 
     create() {
         console.log("Story Started");
+        //play new music
+        this.sound.stopAll();
+        this.sound.play(this.stages[Math.floor(this.level / 10)], {
+            volume: this.stageVolumes[this.stages[Math.floor(this.level / 10)]],
+            loop: true
+        });
         //add main background
         let background = this.add.image(-125, 0, this.stages[Math.floor(this.level / 10)]);
         background.setOrigin(0);
@@ -96,22 +115,19 @@ class Story extends Phaser.Scene {
         let gridBG = this.add.image(225, 675, "gridBackground");
         gridBG.setScale(.40, .7);
         //add text
-        var div = document.createElement('div');
-        div.style = "width: 400px; height: 175px; overflow-y: auto; color: white; font-size: 24px"
-        div.innerText = `${this.storyBits[Math.floor(this.level / 10)]}`;
-        this.add.dom(220, 690, div);
-        //create continue button
-        setTimeout(() => {
-            let conText = this.add.text(100, 525, "Continue...", {
-                fontSize: "42px"
+        let story = this.add.dom(220, 690).createFromCache('story');
+        let textEl = story.parent.querySelector('#story-text');
+        textEl.innerText = `${this.storyBits[Math.floor(this.level / 10)]}`;
+        /** @type {HTMLButtonElement} */
+        let btnEl = story.parent.querySelector('#continue-btn');
+        btnEl.addEventListener('click', () => {
+            this.scene.start("MainScene", {
+                player: this.player,
+                level: this.level
             });
-            conText.setInteractive();
-            conText.on("pointerdown", () => {
-                this.scene.start("MainScene", {
-                    player: this.player,
-                    level: this.level
-                });
-            })
-        }, 5000)
+        });
+        let conText = this.add.text(100, 525, `Chapter ${Math.floor(this.level / 10) + 1}`, {
+            fontSize: "42px"
+        });
     }
 }
