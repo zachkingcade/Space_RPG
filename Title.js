@@ -29,7 +29,7 @@ class Title extends Phaser.Scene {
                     gridSize: 6,
                     quickDraw: 1
                 },
-                level: 95
+                level: 1
             });            
         });
         creditsButtonEl.addEventListener("click", () => {
