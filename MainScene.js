@@ -117,16 +117,6 @@ class MainScene extends Phaser.Scene {
 
         // Quick shot mechanics
         this.fastShots = [];
-
-        // DEBUG Cheat key - REMOVE ME
-        this.input.keyboard.on('keydown-N', () => {
-            //heal player
-            this.player.health = this.player.maxHealth;
-            this.scene.start("Upgrade", {
-                player: this.player,
-                level: this.level
-            })
-        });
     }
 
     createHole() {
@@ -152,10 +142,6 @@ class MainScene extends Phaser.Scene {
             stroke: 'black',
             strokeThickness: 6
         });
-        this.levelText.setInteractive();
-        this.levelText.on("pointerdown", () => {
-            this.playerAttack(100);
-        })
     }
 
     createHealthUi() {

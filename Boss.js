@@ -90,16 +90,6 @@ class Boss extends Phaser.Scene {
 
         // Quick shot mechanics
         this.fastShots = [];
-
-        // DEBUG Cheat key - REMOVE ME
-        this.input.keyboard.on('keydown-N', () => {
-            //heal player
-            this.player.health = this.player.maxHealth;
-            this.scene.start("Upgrade", {
-                player: this.player,
-                level: this.level
-            })
-        });
     }
 
     createHole() {

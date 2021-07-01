@@ -18,16 +18,7 @@ class Upgrade extends Phaser.Scene {
         let bg = this.add.image(225, 220, "upgradeBackground");
         bg.setOrigin(.5);
         bg.setScale(.3);
-
-        // DEBUG Cheat key - REMOVE ME
-        this.input.keyboard.on('keydown-N', () => {
-            this.player.maxHealth += 150;
-            this.player.baseDamage += 3;
-            this.player.tileMod += 0.6;
-            this.player.gridSize = 10;
-            this.player.health = this.player.maxHealth;
-            this.leaveScene();
-        });
+        
         this.upgrades = [
             "Health",
             "Base Damage",
