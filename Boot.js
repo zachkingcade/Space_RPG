@@ -5,6 +5,8 @@ class Boot extends Phaser.Scene {
     }
 
     preload() {
+        // Create loading bars and callbacks based on loading progress
+        this.trackProgess();
         console.log("Boot Started");
         this.load.spritesheet("items", "./assets/images/userInterface/rpg_items.png", {
             frameWidth: 16,
@@ -114,6 +116,43 @@ class Boot extends Phaser.Scene {
             repeat: -1
         });
         this.scene.start("Title");
+    }
+
+    trackProgess() {
+        this.add.rectangle(225, 400, 225, 50, 0x222222, 0.8);
+        let bar = this.add.rectangle(225, 400, (225 - 20), 30, 0x777777, 1);
+        // Create text that just says "loading assets"
+        let loadingText = this.add.text(225, 400 - 50,
+            'Loading Assets...',
+            {
+                font: '20px monospace',
+                fill: '#ffffff'
+            });
+        loadingText.setOrigin(0.5, 0.5);
+        // Create the text that tracks progress percentage
+        let percent = this.add.text(225, 400,
+            '0%',
+            {
+                font: '18px monospace',
+                fill: '#ffffff'
+            });
+        percent.setOrigin(0.5, 0.5);
+        // Create text that displays the currently loading file
+        let asset = this.add.text(225, 400 + 50,
+            '',
+            {
+                font: '18px monospace',
+                fill: '#ffffff'
+            });
+        asset.setOrigin(0.5, 0.5);
+        // Tracking loading progress
+        this.load.on('progress', (p) => {
+            percent.setText((p * 100).toFixed(2) + '%');
+            bar.setScale(p, 1);
+        });
+        this.load.on('fileprogress', (file) => {
+            asset.setText(file.src);
+        });
     }
 }
 
@@ -332,7 +371,7 @@ var enemyData = {
         scale: .25,
         y: 20
     },
-    "11_boss1":{
+    "11_boss1": {
         name: "The One Above All",
         scale: .4
     },
