@@ -164,11 +164,16 @@ class MainScene extends Phaser.Scene {
         });
         this.enemyHpText.setDepth(2);
         //create enemy name text
-        this.enemyNameText = this.add.text(235, 70, `${enemyData[this.enemyName].name}`, {
-            fontSize: "32px",
+        this.enemyNameText = this.add.text(225, 70, `${enemyData[this.enemyName].name}`, {
+            fontSize: "30px",
             fontStyle: "bold",
             stroke: 'black',
-            strokeThickness: 6
+            strokeThickness: 6,
+            align: 'center',
+            wordWrap: {
+                width: 420,
+                useAdvancedWrap: true
+            }
         });
         this.enemyNameText.setOrigin(.5);
     }

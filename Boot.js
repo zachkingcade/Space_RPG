@@ -237,10 +237,10 @@ var enemyData = {
         name: "Mysterious Jester",
     },
     "05_town4": {
-        name: "Kalim Beat Cop",
+        name: "City Enforcement Thug",
     },
     "05_town5": {
-        name: "Kalim P.D. Mage",
+        name: "City Enforcement Agent",
         y: 30
     },
     "05_town6": {
@@ -273,25 +273,25 @@ var enemyData = {
         y: 35
     },
     "07_hallway1": {
-        name: "Starving",
+        name: "Starving Sin",
         scale: .35,
         y: 35
     },
     "07_hallway2": {
-        name: "Breaking",
+        name: "Twisted Sin",
         scale: .35,
         y: 35
     },
     "07_hallway3": {
-        name: "Lying",
+        name: "Lying Sin",
     },
     "07_hallway4": {
-        name: "Whispering",
+        name: "Whispering Sin",
         scale: .2,
         y: 35
     },
     "07_hallway5": {
-        name: "Crying",
+        name: "Crying Sin",
         scale: .2,
         y: 35
     },
@@ -301,7 +301,7 @@ var enemyData = {
         y: 35
     },
     "08_medbay2": {
-        name: "Vanguard Solider",
+        name: "Vanguard Soldier",
         scale: .2,
         y: 35
     },
@@ -316,27 +316,27 @@ var enemyData = {
         y: 45
     },
     "08_medbay5": {
-        name: "Shaman",
+        name: "Spirit Channeler",
         scale: .2,
     },
     "08_medbay6": {
-        name: "Corrupt Witch",
+        name: "Rot Witch",
     },
     "09_breakout1": {
-        name: "Female Abomination",
+        name: "Awakened Vond",
         scale: .18,
         y: 25
     },
     "09_breakout2": {
-        name: "long-neck Abomination",
+        name: "Warped Amalgamate",
         scale: .2,
         y: 30
     },
     "09_breakout3": {
-        name: "Mystic Two-headed Amalgamation",
+        name: "Silence",
     },
     "09_breakout4": {
-        name: "Soul-Trapped Abomination",
+        name: "Enslaved Spirit",
         y: 30
     },
     "09_breakout5": {
@@ -344,30 +344,30 @@ var enemyData = {
         y: 30
     },
     "09_breakout6": {
-        name: "Soul-Broken Mystic Angel",
+        name: "Wretched Sin",
         scale: .2,
         y: 30
     },
     "09_breakout7": {
-        name: "Cursed Abomination",
+        name: "Fallen One",
         scale: .18
     },
     "10_FinalRoom1": {
-        name: "Forge Burned Brother",
+        name: "Dawn Flame Dancer",
         scale: .2
     },
     "10_FinalRoom2": {
-        name: "Cursed Sister",
+        name: "Dawn Lightbringer",
         scale: .2,
         y: 30
     },
     "10_FinalRoom3": {
-        name: "Demi-Child",
+        name: "Dawnchild",
         scale: .2,
         y: 30
     },
     "10_FinalRoom4": {
-        name: "TOAA Guard",
+        name: "Guardian of The One",
         scale: .25,
         y: 20
     },

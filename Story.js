@@ -101,20 +101,26 @@ class Story extends Phaser.Scene {
             cutters to free us. Then we space the rest of the cultists and set off charges to kill whatever
             that creepy freak hidin in the darkness is.`.replace(/\s            /g, ' '),
 
-            `Looks Like that freak is coming out of the dark. I guess it's not too happy I spaced all it's
-            friends. This definitely goes against protocol but I'm going to ice this last one myself while
-            the charges gear up to go off.
-            `.replace(/\s            /g, ' '),
+            `Looks Like that freak is coming out of the dark. Guess its not too happy we spaced all its
+            friends. Prolly against protocol but les ice this last one ourselves while the charges count
+            down.`.replace(/\s            /g, ' '),
 
-            `Now that the freak is done with we need to get out of here! Its a long run down the hallway and
-            *BOOM*, we made it out, a little scuffed up and bloody but we survived a TL-9 planet and managed
-            to take down the Galactic Dawn, not bad for a days work shoulda say so myself.\n\n
-            *Sometime Later*\n\n
-            I came across a crew of higher ranking officer that had apparently been staking out the Galactic
-            Dawn for some time now. They were amazed I was able to go in there and take them out with nothing
-            but the basic standard issue equipment but I guess I'm just that good. They give me a ride back to
-            HQ so I can report, I think after that I'll go back home and spend some time BBQ at home in Texas.
-            That sounds like the best way to celebrate to me. Yee-Haw, we're off again.
+            `We need to get out of here! Just keep running this wa--
+            Get up! Get back up! There was an explosion, keep moving.
+            
+            ...
+            
+            A little scuffed up and bloody but we're alright. Survived a TL-9 planet and managed
+            to take down the Galactic Dawn, not a bad days work I figure.
+            
+            ...
+
+            Came across a coupla officers that had been staking out the Galactic Dawn. They were impressed we
+            took em out with such limited gear. We gettin promoted and a mighty fine pay raise. Guess we're
+            just that good. Gonna hitch a ride back with them fellas, rest back home and maybe have a
+            barbeque. Yeeeeeeehaw!
+
+            Til next time, pardner.
             `.replace(/\s            /g, ' '),
         ]
     }

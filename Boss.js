@@ -491,17 +491,22 @@ class Boss extends Phaser.Scene {
     }
 
     bossRemoveRows() {
-        let numToRemove = Math.floor(Math.random() * 3) + 2;
+        let numToRemove = 1;//Math.floor(Math.random() * 3) + 2;
         for (let i = 0; i < numToRemove; i++) {
             let row = Math.floor(Math.random() * this.gridRows);
             let column = Math.floor(Math.random() * this.gridColumns);
+            const valid = (r, c) => {
+                if (!this.grid[r]) return false;
+                if (!this.grid[r][c]) return false;
+                return true;
+            }
+            while(!valid(row, column)){
+                row = Math.floor(Math.random() * this.gridRows);
+                column = Math.floor(Math.random() * this.gridColumns);
+            }
             this.deleteTiles(row, column, this.grid[row][column].color);
             this.settleTiles();
             this.shiftColumnsInwards();
         }
-        // Wait a moment to redraw the tiles
-        setTimeout(() => {
-            this.redrawTiles();
-        }, 100);
     }
 }
