@@ -37,6 +37,8 @@ class Boot extends Phaser.Scene {
             "08_medbay",
             "09_breakout",
             "10_FinalRoom",
+            "11_boss",
+            "12_endcard"
         ]
         this.stageEnemyCount = {
             0: 5,
@@ -48,7 +50,8 @@ class Boot extends Phaser.Scene {
             6: 5,
             7: 6,
             8: 7,
-            9: 5,
+            9: 4,
+            10: 1
         }
         //load backgrounds and monsters
         for (let s = 0; s < this.stages.length; s++) {
@@ -68,16 +71,19 @@ class Boot extends Phaser.Scene {
         this.load.audio("gunshot3", "./assets/audio/sounds/Ancient_Game_Flint_Lock_Rifle_Gun_Shot_4.wav");
         this.load.audio("comboBoom", "./assets/audio/sounds/STORM MAGIC SPELL - Cinematic Electricity Thunder Hit - Weapon Throw Impact 01    [003789].mp3");
         //load music
-        this.load.audio("01_wreck", "./assets/audio/music/Dungeon_2.mp3")
-        this.load.audio("02_junkyard", "./assets/audio/music/Dungeon_3.mp3")
-        this.load.audio("03_forest", "./assets/audio/music/Suspicious Town.mp3")
-        this.load.audio("04_distantCity", "./assets/audio/music/Battle_-_Warriors_Heart.m4a")
-        this.load.audio("05_town", "./assets/audio/music/Journey into Fog (looped).wav")
-        this.load.audio("06_door", "./assets/audio/music/Protection of Kingdom (looped).wav")
-        this.load.audio("07_hallway", "./assets/audio/music/Friendly Ghosts.mp3")
-        this.load.audio("08_medbay", "./assets/audio/music/Epic Battle 2 (Looped).wav")
-        this.load.audio("09_breakout", "./assets/audio/music/A Long Way (Looped).wav")
-        this.load.audio("10_FinalRoom", "./assets/audio/music/Action Dynamic Track 1 (looped).wav")
+        this.load.audio("titleMusic", "./assets/audio/music/Abstract Theme Loop 2.wav");
+        this.load.audio("01_wreck", "./assets/audio/music/Dungeon_2.mp3");
+        this.load.audio("02_junkyard", "./assets/audio/music/Dungeon_3.mp3");
+        this.load.audio("03_forest", "./assets/audio/music/Suspicious Town.mp3");
+        this.load.audio("04_distantCity", "./assets/audio/music/Battle_-_Warriors_Heart.m4a");
+        this.load.audio("05_town", "./assets/audio/music/Journey into Fog (looped).wav");
+        this.load.audio("06_door", "./assets/audio/music/Protection of Kingdom (looped).wav");
+        this.load.audio("07_hallway", "./assets/audio/music/Friendly Ghosts.mp3");
+        this.load.audio("08_medbay", "./assets/audio/music/Epic Battle 2 (Looped).wav");
+        this.load.audio("09_breakout", "./assets/audio/music/A Long Way (Looped).wav");
+        this.load.audio("10_FinalRoom", "./assets/audio/music/Action Dynamic Track 1 (looped).wav");
+        this.load.audio("11_boss", "./assets/audio/music/Energy Rock Track 3 (looped).wav");
+        this.load.audio("12_endcard", "./assets/audio/music/Soft Relaxing Track (looped).wav");
     }
 
     create() {
@@ -322,12 +328,12 @@ var enemyData = {
         y: 30
     },
     "10_FinalRoom4": {
-        name: "The One Above All",
-        scale: .4
-    },
-    "10_FinalRoom5": {
         name: "TOAA Guard",
         scale: .25,
         y: 20
+    },
+    "11_boss1":{
+        name: "The One Above All",
+        scale: .4
     },
 }

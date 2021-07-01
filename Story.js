@@ -21,10 +21,12 @@ class Story extends Phaser.Scene {
             7: "08_medbay",
             8: "09_breakout",
             9: "10_FinalRoom",
+            10: "11_boss",
+            11: "12_endcard"
         }
         //volume by song because apparently everything has to be custom, ughhh
         this.stageVolumes = {
-            "01_wreck": .5,
+            "01_wreck": .65,
             "02_junkyard": .5,
             "03_forest": .75,
             "04_distantCity": .25,
@@ -34,6 +36,8 @@ class Story extends Phaser.Scene {
             "08_medbay": .5,
             "09_breakout": .25,
             "10_FinalRoom": .25,
+            "11_boss": .5,
+            "12_endcard": .5
         }
         this.storyBits = [
             `Well, that dunnit. Ten years o service and we get blasted outta space by some mangy ol bandits.
@@ -95,7 +99,23 @@ class Story extends Phaser.Scene {
             "Alright, get the prisoner prepped for sacrificing"\n\n
             Well, spose ya cant beat the classics, so we cant exactly blame em. Time to deploy the laser
             cutters to free us. Then we space the rest of the cultists and set off charges to kill whatever
-            that creepy eight eyed freak hidin in the darkness is.`.replace(/\s            /g, ' ')
+            that creepy freak hidin in the darkness is.`.replace(/\s            /g, ' '),
+
+            `Looks Like that freak is coming out of the dark. I guess it's not too happy I spaced all it's
+            friends. This definitely goes against protocol but I'm going to ice this last one myself while
+            the charges gear up to go off.
+            `.replace(/\s            /g, ' '),
+
+            `Now that the freak is done with we need to get out of here! Its a long run down the hallway and
+            *BOOM*, we made it out, a little scuffed up and bloody but we survived a TL-9 planet and managed
+            to take down the Galactic Dawn, not bad for a days work shoulda say so myself.\n\n
+            *Sometime Later*\n\n
+            I came across a crew of higher ranking officer that had apparently been staking out the Galactic
+            Dawn for some time now. They were amazed I was able to go in there and take them out with nothing
+            but the basic standard issue equipment but I guess I'm just that good. They give me a ride back to
+            HQ so I can report, I think after that I'll go back home and spend some time BBQ at home in Texas.
+            That sounds like the best way to celebrate to me. Yee-Haw, we're off again.
+            `.replace(/\s            /g, ' '),
         ]
     }
 
@@ -121,10 +141,20 @@ class Story extends Phaser.Scene {
         /** @type {HTMLButtonElement} */
         let btnEl = story.parent.querySelector('#continue-btn');
         btnEl.addEventListener('click', () => {
-            this.scene.start("MainScene", {
-                player: this.player,
-                level: this.level
-            });
+            if(this.level < 100){
+                this.scene.start("MainScene", {
+                    player: this.player,
+                    level: this.level
+                });
+            } else if (this.level == 100) {
+                this.scene.start("Boss", {
+                    player: this.player,
+                    level: this.level
+                });
+            } else {
+                this.scene.start("Title");
+            }
+            
         });
         let conText = this.add.text(100, 525, `Chapter ${Math.floor(this.level / 10) + 1}`, {
             fontSize: "42px"

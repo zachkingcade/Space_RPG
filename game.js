@@ -23,7 +23,9 @@ const config = {
         MainScene,
         Upgrade,
         Story,
-        Credits
+        Credits,
+        Tutorial,
+        Boss
     ],
     physics: {
         default: 'arcade',

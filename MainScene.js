@@ -42,6 +42,7 @@ class MainScene extends Phaser.Scene {
             7: "08_medbay",
             8: "09_breakout",
             9: "10_FinalRoom",
+            10: "11_boss"
         }
         this.stageEnemyCount = {
             0: 5,
@@ -53,7 +54,7 @@ class MainScene extends Phaser.Scene {
             6: 5,
             7: 6,
             8: 7,
-            9: 5,
+            9: 4,
         }
         this.gridRows = this.player.gridSize;
         this.gridColumns = Math.floor(this.gridRows / 2);
@@ -84,6 +85,7 @@ class MainScene extends Phaser.Scene {
         this.enemyGraghic = this.add.image(220, 300, this.enemyName);
         this.enemyGraghic.setScale(.45);
         //check enemy data for special properties
+        console.log(this.enemyName);
         if (enemyData[this.enemyName].scale) {
             this.enemyGraghic.setScale(enemyData[this.enemyName].scale);
         }

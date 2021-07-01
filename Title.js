@@ -9,6 +9,11 @@ class Title extends Phaser.Scene {
     }
 
     create() {
+        this.sound.stopAll();
+        this.sound.play("titleMusic", {
+            volume: .35,
+            loop: true
+        })
         let menu = this.add.dom(300,400).createFromCache("button");
         let playButtonEl = menu.parent.querySelector("#play");
         let tutorialButtonEl = menu.parent.querySelector("#tutorial");
@@ -24,13 +29,15 @@ class Title extends Phaser.Scene {
                     gridSize: 6,
                     quickDraw: 1
                 },
-                level: 1
+                level: 95
             });            
         });
         creditsButtonEl.addEventListener("click", () => {
             this.scene.start("Credits");
         })
-
+        tutorialButtonEl.addEventListener("click", () => {
+            this.scene.start("Tutorial");
+        })
         this.backgroundLayers = [
             this.add.tileSprite(225, 400, 450, 800, "titleScreenBackground1"),
             this.add.tileSprite(225, 400, 450, 800, "titleScreenBackground2"),
