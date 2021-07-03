@@ -6,8 +6,10 @@ class Boss extends Phaser.Scene {
     }
 
     init(data) {
-        this.player = data.player;
-        this.level = data.level;
+        this.saveData = data.saveData;
+        this.playerSaveIndex = data.index;
+        this.player = this.saveData[this.playerSaveIndex].player;
+        this.level = this.saveData[this.playerSaveIndex].level;
     }
 
     preload() {
@@ -392,6 +394,8 @@ class Boss extends Phaser.Scene {
                         onComplete:
                             () => {
                                 console.log("Game Over!");
+                                this.saveData[this.playerSaveIndex] = {status: "empty"};
+                                localStorage.setItem("ZekeTheDeveloper.SpaceRPG", JSON.stringify(this.saveData));
                                 setTimeout(() => {
                                     this.scene.start("Title");
                                 }, 1000);
@@ -427,8 +431,8 @@ class Boss extends Phaser.Scene {
                             //heal player
                             this.player.health = this.player.maxHealth;
                             this.scene.start("Story", {
-                                player: this.player,
-                                level: 110
+                                saveData: this.saveData,
+                                index: this.playerSaveIndex
                             })
                         }, 500);
                     }

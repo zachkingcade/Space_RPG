@@ -25,7 +25,8 @@ const config = {
         Story,
         Credits,
         Tutorial,
-        Boss
+        Boss,
+        Saves
     ],
     physics: {
         default: 'arcade',

@@ -27,6 +27,7 @@ class Boot extends Phaser.Scene {
         this.load.image("back", "./assets/images/userInterface/back_button.png")
         this.load.image("platform", "./assets/images/backgrounds/01_wreck.png")
         this.load.html('story', './assets/menus/story.html');
+        this.load.html("confirmation", './assets/menus/confirmation.html')
         //bring in enemies
         this.stages = [
             "01_wreck",

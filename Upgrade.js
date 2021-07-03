@@ -5,8 +5,10 @@ class Upgrade extends Phaser.Scene {
     }
 
     init(data) {
-        this.player = data.player;
-        this.level = data.level;
+        this.saveData = data.saveData;
+        this.playerSaveIndex = data.index;
+        this.player = this.saveData[this.playerSaveIndex].player;
+        this.level = this.saveData[this.playerSaveIndex].level;
     }
 
     create() {
@@ -18,7 +20,7 @@ class Upgrade extends Phaser.Scene {
         let bg = this.add.image(225, 220, "upgradeBackground");
         bg.setOrigin(.5);
         bg.setScale(.3);
-        
+
         this.upgrades = [
             "Health",
             "Base Damage",
@@ -50,15 +52,19 @@ class Upgrade extends Phaser.Scene {
 
     leaveScene() {
         this.level += 1;
+        this.saveData[this.playerSaveIndex].player = this.player;
+        this.saveData[this.playerSaveIndex].level = this.level;
+        //save players data
+        localStorage.setItem("ZekeTheDeveloper.SpaceRPG", JSON.stringify(this.saveData));
         if (Number.isInteger(this.level / 10)) {
             this.scene.start("Story", {
-                player: this.player,
-                level: this.level
+                saveData: this.saveData,
+                index: this.playerSaveIndex
             })
         } else {
             this.scene.start("MainScene", {
-                player: this.player,
-                level: this.level
+                saveData: this.saveData,
+                index: this.playerSaveIndex
             })
         }
     }
@@ -153,7 +159,7 @@ class Upgrade extends Phaser.Scene {
             this.player.tileMod += 0.2;
         } else if (upgradeString == "Grid Size") {
             this.player.gridSize += 1;
-        } else if (upgradeString == "Quick Draw"){
+        } else if (upgradeString == "Quick Draw") {
             this.player.quickDraw += 1;
         }
     }

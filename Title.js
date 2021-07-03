@@ -20,16 +20,7 @@ class Title extends Phaser.Scene {
         let creditsButtonEl = menu.parent.querySelector("#credits");
 
         playButtonEl.addEventListener('click', () => {
-            this.scene.start("Story", {
-                player: {
-                    health: 200,
-                    maxHealth: 200,
-                    baseDamage: 3,
-                    tileMod: 1.4,
-                    gridSize: 6,
-                    quickDraw: 1
-                },
-                level: 1
+            this.scene.start("Saves", {
             });
         });
         creditsButtonEl.addEventListener("click", () => {

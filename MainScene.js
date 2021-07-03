@@ -6,8 +6,10 @@ class MainScene extends Phaser.Scene {
     }
 
     init(data) {
-        this.player = data.player;
-        this.level = data.level;
+        this.saveData = data.saveData;
+        this.playerSaveIndex = data.index;
+        this.player = this.saveData[this.playerSaveIndex].player;
+        this.level = this.saveData[this.playerSaveIndex].level;
     }
 
     preload() {
@@ -419,6 +421,8 @@ class MainScene extends Phaser.Scene {
                         onComplete:
                             () => {
                                 console.log("Game Over!");
+                                this.saveData[this.playerSaveIndex] = { status: "empty" };
+                                localStorage.setItem("ZekeTheDeveloper.SpaceRPG", JSON.stringify(this.saveData));
                                 setTimeout(() => {
                                     this.scene.start("Title");
                                 }, 1000);
@@ -426,6 +430,32 @@ class MainScene extends Phaser.Scene {
                     });
                 }
         });
+    }
+
+    spawnAttackNumber(damage, combo) {
+        let pointer = this.input.activePointer;
+        let color = "red";
+        if(combo > 9){
+            color = "gold";
+        }
+        let damageText = this.add.text(pointer.x, pointer.y, damage, {
+            fontSize: "32px",
+            color: color,
+            stroke: 'black',
+            strokeThickness: 6
+        })
+        this.add.tween({
+            targets: damageText,
+            duration: 1000,
+            y: damageText.y - 200,
+            alpha: 0,
+            repeat: 0,
+            yoyo: false,
+            ease: Phaser.Math.Easing.Quadratic.In,
+            onComplete: () => {
+                damageText.destroy();
+            }
+        })
     }
 
     playerAttack(combo) {
@@ -437,6 +467,7 @@ class MainScene extends Phaser.Scene {
         // Calculate the damage
         let damage = this.calculateDamage(combo);
         this.enemyHealth -= damage;
+        this.spawnAttackNumber(damage, combo);
         if (combo < 10) {
             this.smallComboBoom();
         } else {
@@ -453,9 +484,12 @@ class MainScene extends Phaser.Scene {
                         setTimeout(() => {
                             //heal player
                             this.player.health = this.player.maxHealth;
+                            //save the players current state
+                            this.saveData[this.playerSaveIndex].player = this.player;
+                            this.saveData[this.playerSaveIndex].level = this.level;
                             this.scene.start("Upgrade", {
-                                player: this.player,
-                                level: this.level
+                                saveData: this.saveData,
+                                index: this.playerSaveIndex
                             })
                         }, 500);
                     }

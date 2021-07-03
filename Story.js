@@ -5,8 +5,11 @@ class Story extends Phaser.Scene {
     }
 
     init(data) {
-        this.player = data.player;
-        this.level = data.level;
+        this.saveData = data.saveData;
+        this.playerSaveIndex = data.index;
+        console.log(this.saveData, this.playerSaveIndex);
+        this.player = this.saveData[this.playerSaveIndex].player;
+        this.level = this.saveData[this.playerSaveIndex].level;
     }
 
     preload() {
@@ -147,20 +150,22 @@ class Story extends Phaser.Scene {
         /** @type {HTMLButtonElement} */
         let btnEl = story.parent.querySelector('#continue-btn');
         btnEl.addEventListener('click', () => {
-            if(this.level < 100){
+            this.saveData[this.playerSaveIndex].player = this.player;
+            this.saveData[this.playerSaveIndex].level = this.level;
+            if (this.level < 100) {
                 this.scene.start("MainScene", {
-                    player: this.player,
-                    level: this.level
+                    saveData: this.saveData,
+                    index: this.playerSaveIndex
                 });
             } else if (this.level == 100) {
                 this.scene.start("Boss", {
-                    player: this.player,
-                    level: this.level
+                    saveData: this.saveData,
+                    index: this.playerSaveIndex
                 });
             } else {
                 this.scene.start("Title");
             }
-            
+
         });
         let conText = this.add.text(100, 525, `Chapter ${Math.floor(this.level / 10) + 1}`, {
             fontSize: "42px"
